@@ -34,6 +34,7 @@
     "@sanity/rich-date-input": "0.136.0",
     "@sanity/storybook": "0.136.0",
     "@sanity/vision": "0.136.3",
+    "@sanity/welcome-tool": "*",
     "@turf/helpers": "^6.0.1",
     "@turf/points-within-polygon": "^5.1.5",
     "bio-pv": "^1.8.1",

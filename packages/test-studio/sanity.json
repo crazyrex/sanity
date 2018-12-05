@@ -32,6 +32,7 @@
     "@sanity/rich-date-input",
     "@sanity/code-input",
     "@sanity/color-input",
+    "@sanity/welcome-tool",
     "@sanity/desk-tool",
     "@sanity/storybook",
     "@sanity/google-maps-input",
