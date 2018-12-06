@@ -6,26 +6,18 @@
 */
 
 .root {
-  display: flex;
-  margin: 0;
-  padding: 0;
   position: relative;
-  justify-content: flex-start;
-  flex-direction: column;
   width: 100%;
-  min-height: 100%;
-  background-color: var(--input-bg);
+  box-sizing: border-box;
 }
 
 .editor {
-  display: block;
+  /* make the whole field clickable */
   height: 100%;
-  width: 100%;
 }
 
 .root.hasBlockExtras:not(.fullscreen) {
-  margin-right: 5rem;
-  border-right: 1px solid var(--gray);
+  margin-right: var(--block-extras-width);
 }
 
 /* less spacing on block objects / non-text objects */
@@ -74,22 +66,6 @@
 
     @media (--screen-large) {
       margin-top: 4rem;
-    }
-  }
-}
-
-.editor > *:last-child {
-  align-self: stretch;
-  flex-grow: 1;
-  padding-bottom: var(--small-padding);
-
-  @media (--screen-medium) {
-    padding-bottom: var(--medium-padding);
-  }
-
-  @nest .fullscreen & {
-    @media (--screen-medium) {
-      padding-bottom: var(--large-padding);
     }
   }
 }
