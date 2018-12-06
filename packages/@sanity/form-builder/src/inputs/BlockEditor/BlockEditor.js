@@ -108,19 +108,6 @@ export default class BlockEditor extends React.PureComponent<Props, State> {
   _editorWrapper: ?HTMLElement = null
   _editor: ElementRef<any> = React.createRef()
 
-  componentDidMount() {
-    this.checkScrollHeight()
-    if (this._scrollContainer) {
-      this._scrollContainer.addEventListener('scroll', this.handleScroll, {passive: true})
-    }
-  }
-
-  componentWillUnmount() {
-    if (this._scrollContainer) {
-      this._scrollContainer.removeEventListener('scroll', this.handleScroll, {passive: true})
-    }
-  }
-
   componentDidUpdate() {
     this.checkScrollHeight()
   }
@@ -176,6 +163,7 @@ export default class BlockEditor extends React.PureComponent<Props, State> {
     const {focusPath, readOnly, onBlur, onFocus, onPatch, markers, value, fullscreen} = this.props
     return (
       <EditNode
+        editor={this.getEditor()}
         focusPath={focusPath}
         fullscreen={fullscreen}
         markers={markers}
@@ -212,28 +200,6 @@ export default class BlockEditor extends React.PureComponent<Props, State> {
           preventScroll
         })
       }
-    }
-  }
-
-  handleScroll = (event: Event) => {
-    if (!this.props.fullscreen) {
-      this.setState({
-        toolbarStyle: {}
-      })
-    }
-    if (event.currentTarget instanceof HTMLDivElement) {
-      const threshold = 100
-      const scrollTop = event.currentTarget.scrollTop
-      let ratio = scrollTop / threshold
-      if (ratio >= 1) {
-        ratio = 1
-      }
-      this.setState({
-        toolbarStyle: {
-          backgroundColor: `rgba(255, 255, 255, ${ratio * 1})`,
-          boxShadow: `0 2px ${5 * ratio}px rgba(0, 0, 0, ${ratio * 0.3})`
-        }
-      })
     }
   }
 
@@ -317,20 +283,17 @@ export default class BlockEditor extends React.PureComponent<Props, State> {
     }
     return (
       <div>
-        <div className={styles.toolbar}>
-          <Toolbar
-            blockContentFeatures={blockContentFeatures}
-            editor={this.getEditor()}
-            editorValue={editorValue}
-            fullscreen={fullscreen}
-            markers={markers}
-            onFocus={onFocus}
-            onToggleFullScreen={this.handleToggleFullscreen}
-            style={fullscreen ? this.state.toolbarStyle : {}}
-            type={type}
-            userIsWritingText={userIsWritingText}
-          />
-        </div>
+        <Toolbar
+          blockContentFeatures={blockContentFeatures}
+          editor={this.getEditor()}
+          editorValue={editorValue}
+          fullscreen={fullscreen}
+          markers={markers}
+          onFocus={onFocus}
+          onToggleFullScreen={this.handleToggleFullscreen}
+          type={type}
+          userIsWritingText={userIsWritingText}
+        />
         {isLoading && (
           <div className={styles.loading}>
             <Spinner center />
@@ -360,11 +323,7 @@ export default class BlockEditor extends React.PureComponent<Props, State> {
           }
           onActivate={setFocus}
         >
-          <div
-            className={styles.scrollContainer}
-            ref={this.setScrollContainer}
-            onScroll={this.handleScroll}
-          >
+          <div className={styles.scrollContainer} ref={this.setScrollContainer}>
             <div className={styles.editorWrapper} ref={this.setEditorWrapper}>
               {this.renderEditor()}
               {isEditingNode && fullscreen && this.renderNodeEditor()}

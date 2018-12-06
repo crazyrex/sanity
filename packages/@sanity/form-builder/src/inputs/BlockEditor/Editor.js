@@ -1,7 +1,7 @@
 // @flow
 import type {ElementRef} from 'react'
 
-import React, {Fragment} from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom'
 import SoftBreakPlugin from 'slate-soft-break'
 import {findDOMNode, Editor as SlateReactEditor, getEventTransfer} from 'slate-react'
@@ -92,6 +92,11 @@ type Props = {
   value: ?(FormBuilderValue[])
 }
 
+function scrollIntoView(node: SlateNode) {
+  const element = findDOMNode(node) // eslint-disable-line react/no-find-dom-node
+  element.scrollIntoView({behavior: 'instant', block: 'center', inline: 'nearest'})
+}
+
 export default class Editor extends React.Component<Props> {
   static defaultProps = {
     readOnly: false,
@@ -143,22 +148,7 @@ export default class Editor extends React.Component<Props> {
   }
 
   componentDidMount() {
-    const {editorValue, focusPath} = this.props
-    if ((focusPath || []).length) {
-      const block = editorValue.document.getDescendant(focusPath[0]._key)
-      if (!block) {
-        return
-      }
-      // Wait for things to get finshed rendered before scrolling there
-      setTimeout(
-        () =>
-          window.requestAnimationFrame(() => {
-            const element = findDOMNode(block) // eslint-disable-line react/no-find-dom-node
-            element.scrollIntoView({behavior: 'instant', block: 'center', inline: 'nearest'})
-          }),
-        0
-      )
-    }
+    this.trackFocusPath()
   }
 
   componentDidUpdate(prevProps: Props) {
@@ -182,11 +172,11 @@ export default class Editor extends React.Component<Props> {
   // Select the block according to the focusPath and scroll there
   // eslint-disable-next-line complexity
   trackFocusPath() {
+    const {focusPath, editorValue} = this.props
     const editor = this.getEditor()
-    if (!editor) {
+    if (!(editor && focusPath)) {
       return
     }
-    const {focusPath, editorValue, readOnly} = this.props
     const focusPathIsSingleBlock =
       editorValue.focusBlock && isEqual(focusPath, [{_key: editorValue.focusBlock.key}])
     const block = editorValue.document.getDescendant(focusPath[0]._key)
@@ -201,7 +191,7 @@ export default class Editor extends React.Component<Props> {
             `Could not find a inline with key ${focusPath[2]._key}, something is amiss.`
           )
         }
-        this.scrollIntoView(editor, inline)
+        scrollIntoView(inline)
       } else if (
         // Annotation
         focusPath[1] &&
@@ -209,29 +199,11 @@ export default class Editor extends React.Component<Props> {
         focusPath[2] &&
         (inline = findInlineByAnnotationKey(focusPath[2]._key, block))
       ) {
-        this.scrollIntoView(editor, inline)
+        scrollIntoView(inline)
       } else if (block) {
         // Regular block
-        this.scrollIntoView(editor, block)
+        scrollIntoView(block)
       }
-    } else if (!readOnly) {
-      // Must be here to set focus after editing interfaces are closed
-      inline = editorValue.focusInline
-      if (inline) {
-        // There are some issues where you can't move the cursor
-        // if the focus is collapsed on an inline-node, move forward to next text.
-        editor.moveForward()
-      }
-      editor.focus()
-    }
-  }
-
-  scrollIntoView(editor: SlateEditor, node: SlateNode) {
-    const {readOnly} = this.props
-    const element = findDOMNode(node) // eslint-disable-line react/no-find-dom-node
-    element.scrollIntoView({behavior: 'instant', block: 'center', inline: 'nearest'})
-    if (!readOnly) {
-      editor.moveToEndOfNode(node)
     }
   }
 

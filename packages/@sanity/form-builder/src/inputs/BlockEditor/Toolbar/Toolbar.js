@@ -131,9 +131,10 @@ class Toolbar extends React.PureComponent<Props, State> {
             <div className={styles.primary}>
               <div className={styles.blockFormatContainer} onClick={this.handleContract}>
                 <BlockStyleSelect
-                  editor={editor}
                   blockContentFeatures={blockContentFeatures}
+                  editor={editor}
                   editorValue={editorValue}
+                  onFocus={onFocus}
                 />
               </div>
               <Button className={styles.expandButton} onClick={this.handleExpand} kind="simple">

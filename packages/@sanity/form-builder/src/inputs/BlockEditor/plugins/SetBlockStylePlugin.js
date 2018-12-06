@@ -54,7 +54,6 @@ export default function SetBlockStylePlugin() {
           editor.setNodeByKey(blk.key, {data: newData})
         }
       })
-      editor.focus()
       return editor
     }
   }
